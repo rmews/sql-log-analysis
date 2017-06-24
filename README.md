@@ -22,10 +22,11 @@ The problems the specific queries in this repo set to solve are:
 
 ```
 CREATE OR REPLACE VIEW article_views AS
-SELECT title, count(*) AS views
-FROM articles, log
+SELECT title, views
+FROM articles,
+     (select path, count(*) as views from log
+      group by path) as log
 WHERE log.path LIKE concat('%',articles.slug)
-GROUP BY articles.title
 ORDER BY views desc;
 ```
 
@@ -38,7 +39,7 @@ WHERE articles.author = authors.id;
 
 ```
 CREATE OR REPLACE VIEW total_requests AS
-SELECT to_char(time, 'Month DD, YYYY') AS date, count(*) AS total
+SELECT time::date AS date, count(*) AS total
 FROM log
 GROUP BY date
 ORDER BY date ASC;
@@ -46,7 +47,7 @@ ORDER BY date ASC;
 
 ```
 CREATE OR REPLACE VIEW error_requests AS
-SELECT to_char(time, 'Month DD, YYYY') AS date, status, count(*) AS errors
+SELECT time::date AS date, status, count(*) AS errors
 FROM log
 WHERE status != '200 OK'
 GROUP BY date, status
