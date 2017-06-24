@@ -45,7 +45,7 @@ def get_error_log():
     """Return the days with more than 1% of requests lead to errors"""
     db, c = db_connect()
     c.execute("""
-            SELECT date, error_value
+            SELECT to_char(date, 'FMMonth FMDD, YYYY') AS date, error_value
             FROM daily_error_rate
             WHERE error_value >= 1
             """)
